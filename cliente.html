@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizar Produtos</title>
+  <style>
+    .produto {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+    }
+    h2 {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de Produtos</h1>
+  <div id="produtos-lista"></div>
+
+  <script>
+    async function fetchProdutos() {
+      try {
+        const response = await fetch('http://localhost:3000/api/produtos');
+        const produtos = await response.json();
+
+        const produtosLista = document.getElementById("produtos-lista");
+        produtosLista.innerHTML = ''; // Limpa a lista antes de exibir os produtos
+
+        produtos.forEach(produto => {
+          const produtoDiv = document.createElement("div");
+          produtoDiv.classList.add("produto");
+          produtoDiv.innerHTML = `
+            <h2>${produto.nome}</h2>
+            <p><strong>Modelo:</strong> ${produto.modelo}</p>
+            <p><strong>Descrição:</strong> ${produto.descricao}</p>
+            <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
+            <p><strong>Quantidade:</strong> ${produto.quantidade}</p>
+            <img src="${produto.imagem}" alt="${produto.nome}" style="max-width: 100px; border-radius: 5px;">
+          `;
+          produtosLista.appendChild(produtoDiv);
+        });
+      } catch (error) {
+        console.error("Erro ao obter produtos:", error);
+        alert("Erro ao carregar produtos");
+      }
+    }
+
+    fetchProdutos();
+  </script>
+</body>
+</html>

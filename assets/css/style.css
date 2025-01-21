@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  #produtos-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .produto {
+    border: 1px solid #ccc;
+    margin: 10px;
+    padding: 10px;
+    width: 200px;
+  }
+  
+  .produto h3 {
+    font-size: 18px;
+  }
+  
+  .produto p {
+    font-size: 14px;
+  }
+  

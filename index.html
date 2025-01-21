@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Produtos</title>
+  <style>
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .produto {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gerenciar Produtos</h1>
+  
+  <h2>Adicionar Produto</h2>
+  <form id="formProduto">
+    <input type="text" id="nome" placeholder="Nome do Produto" required>
+    <input type="text" id="modelo" placeholder="Modelo" required>
+    <textarea id="descricao" placeholder="Descrição" required></textarea>
+    <input type="number" id="preco" placeholder="Preço" required>
+    <input type="number" id="quantidade" placeholder="Quantidade" required>
+    <input type="text" id="imagem" placeholder="URL da Imagem" required>
+    <button type="submit">Adicionar Produto</button>
+  </form>
+
+  <h2>Produtos Cadastrados</h2>
+  <div id="produtos-lista"></div>
+
+  <script>
+    // Adicionar produto
+    document.getElementById("formProduto").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const produto = {
+        nome: document.getElementById("nome").value,
+        modelo: document.getElementById("modelo").value,
+        descricao: document.getElementById("descricao").value,
+        preco: parseFloat(document.getElementById("preco").value),
+        quantidade: parseInt(document.getElementById("quantidade").value),
+        imagem: document.getElementById("imagem").value,
+      };
+
+      try {
+        const response = await fetch('http://localhost:3000/api/produtos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(produto),
+        });
+
+        if (response.ok) {
+          alert("Produto adicionado com sucesso!");
+          fetchProdutos(); // Atualiza a lista de produtos
+        } else {
+          alert("Erro ao adicionar produto");
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao se conectar com o servidor");
+      }
+    });
+
+    // Buscar e exibir produtos
+    async function fetchProdutos() {
+      try {
+        const response = await fetch('http://localhost:3000/api/produtos');
+        const produtos = await response.json();
+
+        const produtosLista = document.getElementById("produtos-lista");
+        produtosLista.innerHTML = ''; // Limpa a lista antes de exibir os produtos
+
+        produtos.forEach(produto => {
+          const produtoDiv = document.createElement("div");
+          produtoDiv.classList.add("produto");
+          produtoDiv.innerHTML = `
+            <h3>${produto.nome}</h3>
+            <p><strong>Modelo:</strong> ${produto.modelo}</p>
+            <p><strong>Descrição:</strong> ${produto.descricao}</p>
+            <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
+            <p><strong>Quantidade:</strong> ${produto.quantidade}</p>
+            <img src="${produto.imagem}" alt="${produto.nome}" style="max-width: 100px; border-radius: 5px;">
+            <button onclick="excluirProduto('${produto._id}')">Excluir</button>
+            <button onclick="editarProduto('${produto._id}')">Editar</button>
+          `;
+          produtosLista.appendChild(produtoDiv);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+        alert("Erro ao carregar produtos");
+      }
+    }
+
+    // Excluir produto com validação de senha
+    async function excluirProduto(produtoId) {
+      const senhaExclusao = prompt("Digite a senha para excluir o produto:");
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/produtos/${produtoId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ senhaExclusao }),
+        });
+
+        if (response.ok) {
+          alert("Produto excluído com sucesso!");
+          fetchProdutos(); // Atualiza a lista de produtos
+        } else {
+          const error = await response.json();
+          alert(`Erro: ${error.message}`);
+        }
+      } catch (error) {
+        console.error("Erro ao excluir produto:", error);
+        alert("Erro ao se conectar com o servidor.");
+      }
+    }
+
+    // Editar produto
+    async function editarProduto(produtoId) {
+      const nome = prompt("Digite o novo nome do produto (ou deixe vazio para não alterar):");
+      const descricao = prompt("Digite a nova descrição (ou deixe vazio para não alterar):");
+      const preco = parseFloat(prompt("Digite o novo preço (ou deixe vazio para não alterar):"));
+      const quantidade = parseInt(prompt("Digite a nova quantidade (ou deixe vazio para não alterar):"));
+      const imagem = prompt("Digite o novo caminho da imagem (ou deixe vazio para não alterar):");
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/produtos/${produtoId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...(nome && { nome }),
+            ...(descricao && { descricao }),
+            ...(preco && { preco }),
+            ...(quantidade && { quantidade }),
+            ...(imagem && { imagem }),
+          }),
+        });
+
+        if (response.ok) {
+          alert("Produto atualizado com sucesso!");
+          fetchProdutos(); // Atualiza a lista de produtos
+        } else {
+          const error = await response.json();
+          alert(`Erro: ${error.message}`);
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar produto:", error);
+        alert("Erro ao se conectar com o servidor.");
+      }
+    }
+
+    // Carregar produtos ao iniciar
+    fetchProdutos();
+  </script>
+</body>
+</html> 
