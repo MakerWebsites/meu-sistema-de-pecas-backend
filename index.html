@@ -71,7 +71,7 @@
       };
 
       try {
-        const response = await fetch('http://localhost:3000/api/produtos', {
+        const response = await fetch('https://meu-sistema-de-pecas-backend.onrender.com/api/produtos', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -94,7 +94,7 @@
     // Buscar e exibir produtos
     async function fetchProdutos() {
       try {
-        const response = await fetch('http://localhost:3000/api/produtos');
+        const response = await fetch('https://meu-sistema-de-pecas-backend.onrender.com/api/produtos');
         const produtos = await response.json();
 
         const produtosLista = document.getElementById("produtos-lista");
@@ -126,7 +126,7 @@
       const senhaExclusao = prompt("Digite a senha para excluir o produto:");
 
       try {
-        const response = await fetch(`http://localhost:3000/api/produtos/${produtoId}`, {
+        const response = await fetch(`https://meu-sistema-de-pecas-backend.onrender.com/api/produtos/${produtoId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -156,7 +156,7 @@
       const imagem = prompt("Digite o novo caminho da imagem (ou deixe vazio para não alterar):");
 
       try {
-        const response = await fetch(`http://localhost:3000/api/produtos/${produtoId}`, {
+        const response = await fetch(`https://meu-sistema-de-pecas-backend.onrender.com/api/produtos/${produtoId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
